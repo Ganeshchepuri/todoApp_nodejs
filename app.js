@@ -25,16 +25,7 @@ const initializeDBandServer = async () => {
 };
 initializeDBandServer();
 
-//get the list of todos
-/*
-app.get("/todos/", async (request, response) => {
-const requestQuery = `select * from todo;`;
-const responseResult = await database.all(requestQuery);
-response.send(responseResult);
-});
-*/
 
-//api 1
 
 const hasPriorityAndStatusProperties = (requestQuery) => {
   return (
@@ -85,18 +76,8 @@ app.get("/todos/", async (request, response) => {
   let data = null;
   let getTodosQuery = "";
   const { search_q = "", priority, status, category } = request.query;
-  /*console.log(hasPriorityAndStatusProperties(request.query));
-console.log(hasCategoryAndStatus(request.query));
-console.log(hasCategoryAndPriority(request.query));
-console.log(hasPriorityProperty(request.query));
-console.log(hasStatusProperty(request.query));
-console.log(hasCategoryProperty(request.query));
-console.log(hasSearchProperty(request.query));*/
-
-  /** switch case */
   switch (true) {
-    //scenario 3
-    /**----------- has priority and status -------- */
+   
     case hasPriorityAndStatusProperties(request.query):
       if (priority === "HIGH" || priority === "MEDIUM" || priority === "LOW") {
         if (
@@ -119,8 +100,7 @@ SELECT * FROM todo WHERE status = '${status}' AND priority = '${priority}';`;
 
       break;
 
-    //scenario 5
-    /** has category and status */
+    
     case hasCategoryAndStatus(request.query):
       if (
         category === "WORK" ||
@@ -146,8 +126,7 @@ SELECT * FROM todo WHERE status = '${status}' AND priority = '${priority}';`;
 
       break;
 
-    //scenario 7
-    /** has both category and priority */
+
     case hasCategoryAndPriority(request.query):
       if (
         category === "WORK" ||
@@ -173,8 +152,7 @@ SELECT * FROM todo WHERE status = '${status}' AND priority = '${priority}';`;
 
       break;
 
-    //scenario 2
-    /**-------------- has only priority---------- */
+   
     case hasPriorityProperty(request.query):
       if (priority === "HIGH" || priority === "MEDIUM" || priority === "LOW") {
         getTodosQuery = `
@@ -187,8 +165,7 @@ SELECT * FROM todo WHERE priority = '${priority}';`;
       }
       break;
 
-    //scenario 1
-    /**-------------has only status ------------ */
+
     case hasStatusProperty(request.query):
       if (status === "TO DO" || status === "IN PROGRESS" || status === "DONE") {
         getTodosQuery = `SELECT * FROM todo WHERE status = '${status}';`;
@@ -199,15 +176,13 @@ SELECT * FROM todo WHERE priority = '${priority}';`;
         response.send("Invalid Todo Status");
       }
       break;
-    //has only search property
-    //scenario 4
+ 
     case hasSearchProperty(request.query):
       getTodosQuery = `select * from todo where todo like '%${search_q}%';`;
       data = await database.all(getTodosQuery);
       response.send(data.map((eachItem) => outPutResult(eachItem)));
       break;
-    //scenario 6
-    //has only category
+    
     case hasCategoryProperty(request.query):
       if (
         category === "WORK" ||
@@ -223,7 +198,7 @@ SELECT * FROM todo WHERE priority = '${priority}';`;
       }
       break;
 
-    //default get all todos
+ 
     default:
       getTodosQuery = `select * from todo;`;
       data = await database.all(getTodosQuery);
@@ -231,7 +206,6 @@ SELECT * FROM todo WHERE priority = '${priority}';`;
   }
 });
 
-//api2
 app.get("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   const getToDoQuery = `select * from todo where id=${todoId};`;
@@ -239,7 +213,6 @@ app.get("/todos/:todoId/", async (request, response) => {
   response.send(outPutResult(responseResult));
 });
 
-//api3
 app.get("/agenda/", async (request, response) => {
   const { date } = request.query;
   console.log(isMatch(date, "yyyy-MM-dd"));
@@ -256,7 +229,6 @@ app.get("/agenda/", async (request, response) => {
   }
 });
 
-//api4
 app.post("/todos/", async (request, response) => {
   const { id, todo, priority, status, category, dueDate } = request.body;
   if (priority === "HIGH" || priority === "LOW" || priority === "MEDIUM") {
@@ -294,7 +266,6 @@ VALUES
   }
 });
 
-//api5
 app.put("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   let updateColumn = "";
@@ -327,7 +298,6 @@ due_date='${dueDate}' WHERE id = ${todoId};`;
       }
       break;
 
-    //update priority
     case requestBody.priority !== undefined:
       if (priority === "HIGH" || priority === "LOW" || priority === "MEDIUM") {
         updateTodoQuery = `
@@ -341,8 +311,6 @@ due_date='${dueDate}' WHERE id = ${todoId};`;
         response.send("Invalid Todo Priority");
       }
       break;
-
-    //update todo
     case requestBody.todo !== undefined:
       updateTodoQuery = `
 UPDATE todo SET todo='${todo}', priority='${priority}', status='${status}', category='${category}',
@@ -351,8 +319,7 @@ due_date='${dueDate}' WHERE id = ${todoId};`;
       await database.run(updateTodoQuery);
       response.send(`Todo Updated`);
       break;
-
-    //update category
+      
     case requestBody.category !== undefined:
       if (
         category === "WORK" ||
@@ -370,7 +337,7 @@ due_date='${dueDate}' WHERE id = ${todoId};`;
         response.send("Invalid Todo Category");
       }
       break;
-    //update due date
+   
     case requestBody.dueDate !== undefined:
       if (isMatch(dueDate, "yyyy-MM-dd")) {
         const newDueDate = format(new Date(dueDate), "yyyy-MM-dd");
@@ -387,15 +354,7 @@ due_date='${newDueDate}' WHERE id = ${todoId};`;
       break;
   }
 
-  /*updateTodoQuery = `
-UPDATE todo SET todo='${todo}', priority='${priority}', status='${status}', category='${category}',
-due_date='${dueDate}' WHERE id = ${todoId};`;
-
-const responseData = await database.run(updateTodoQuery);
-response.send(`${updateColumn} Updated`);*/
-});
-
-//api6
+ 
 
 app.delete("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
